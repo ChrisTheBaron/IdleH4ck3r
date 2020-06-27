@@ -5,9 +5,9 @@
 	"icons": [
 
 	],
-	"start_url": "/",
+	"start_url": "/IdleH4ck3r",
 	"background_color": "#3367D6",
 	"display": "standalone",
-	"scope": "/",
+	"scope": "/IdleH4ck3r",
 	"theme_color": "#3367D6"
 }
