@@ -1,6 +1,13 @@
 ﻿body {
     background-color: #00807F;
     margin: 0px;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
 }
 
 /*https://github.com/AlexBSoft/win95.css/blob/master/assets/win95.css*/
@@ -27,12 +34,29 @@ progress {
         background: #1a0094;
     }
 
+.window {
+    max-width: 500px;
+    margin: auto;
+}
 
 #upgrades, #help {
     position: absolute;
     top: 10%;
-    left: 5%;
-    width: 90%;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 90%;
+}
+
+@media only screen and (min-width: 500px) {
+    body {
+        margin: 5vh 0;
+    }
+
+    #upgrades, #help {
+        max-width: 450px;
+    }
 }
 
 .hidden {
