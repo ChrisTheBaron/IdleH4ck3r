@@ -91,6 +91,18 @@ let upgrades = {
 
 $(function () {
 
+    let sfx1 = new Howl({
+        src: ['./sfx001.mp3']
+    });
+
+    let sfx2 = new Howl({
+        src: ['./sfx002.mp3']
+    });
+
+    let sfx3 = new Howl({
+        src: ['./sfx003.mp3']
+    });
+
     let money = parseInt(localStorage.getItem("money"));
     let ram = parseFloat(localStorage.getItem("ram"));
 
@@ -178,6 +190,8 @@ $(function () {
 
         localStorage.setItem(key, items[key].quantity);
 
+        sfx1.play();
+
     });
 
 
@@ -204,6 +218,8 @@ $(function () {
         $('[data-money]').text(money);
         localStorage.setItem("money", money);
 
+        sfx2.play();
+
     });
 
 
@@ -220,6 +236,7 @@ $(function () {
                 } else {
                     $(elem).removeAttr('data-enabled');
                     item.find('[data-run]').removeAttr('disabled');
+                    sfx3.play();
                 }
 
                 // increase our earnings
