@@ -5,7 +5,7 @@
         rate: 1.07,
         profit: 1.67,
         length: 50,
-        auto: true
+        auto: false
     },
     "browser-toolbar": {
         name: "Install Browser Toolbar",
