@@ -26,3 +26,19 @@ progress {
     progress::-webkit-progress-value {
         background: #1a0094;
     }
+
+
+#upgrades, #help {
+    position: absolute;
+    top: 10%;
+    left: 5%;
+    width: 90%;
+}
+
+.hidden {
+    display: none;
+}
+
+.strikethrough {
+    text-decoration: line-through;
+}

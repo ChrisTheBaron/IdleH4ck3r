@@ -3,7 +3,7 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title></title>
+    <title>IdleH4ck3r</title>
 
     <link rel="stylesheet" href="https://unpkg.com/98.css">
     <link rel="stylesheet" href="main.css">
@@ -23,7 +23,7 @@
             </div>
 
             <div class="title-bar-controls">
-                <button aria-label="Help"></button>
+                <button data-open-help aria-label="Help"></button>
             </div>
 
         </div>
@@ -36,11 +36,63 @@
                 <p>
                     Wallet: <span data-money>0</span>&micro;&#8383;
                 </p>
+                <button data-open-upgrades>Purchase Upgrades</button>
             </section>
 
             <hr />
 
-            <sections/>
+            <sections />
+
+        </div>
+    </div>
+
+    <div class="window hidden" id="upgrades">
+        <div class="title-bar">
+
+            <div class="title-bar-text">
+                Upgr4d3s
+            </div>
+
+            <div class="title-bar-controls">
+                <button aria-label="Close"></button>
+            </div>
+
+        </div>
+        <div class="window-body">
+
+            <upgrades />
+
+        </div>
+    </div>
+
+    <div class="window hidden" id="help">
+        <div class="title-bar">
+
+            <div class="title-bar-text">
+                4bout
+            </div>
+
+            <div class="title-bar-controls">
+                <button aria-label="Close"></button>
+            </div>
+
+        </div>
+        <div class="window-body">
+
+            <p>
+                Just another idle game. Use as much ram as possible. Sell heat generated for money.
+            </p>
+
+            <p>
+                Chris Taylor <a href="https://christhebaron.co.uk" target="_blank">christhebaron.co.uk</a>
+            </p>
+
+            <p>
+                Made using
+                <a href="https://jdan.github.io/98.css/" target="_blank">
+                    98.css by @jdan
+                </a>
+            </p>
 
         </div>
     </div>

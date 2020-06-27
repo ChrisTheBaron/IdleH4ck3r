@@ -4,40 +4,89 @@
         base: 3.738,
         rate: 1.07,
         profit: 1.67,
-        length: 50
+        length: 50,
+        auto: true
     },
     "browser-toolbar": {
         name: "Install Browser Toolbar",
         base: 60,
         rate: 1.15,
         profit: 20,
-        length: 100
+        length: 100,
+        auto: false
     },
     "crypto-miner": {
         name: "Run Crypto-miner",
         base: 720,
         rate: 1.14,
         profit: 90,
-        length: 200
+        length: 200,
+        auto: false
     },
     "defrag": {
         name: "Run Defrag",
         base: 8640,
         rate: 1.13,
         profit: 360,
-        length: 400
+        length: 400,
+        auto: false
     },
     "render-animation": {
         name: "Render Animation",
         base: 103680,
         rate: 1.12,
         profit: 2160,
-        length: 800
+        length: 800,
+        auto: false
     }
 };
 
 let upgrades = {
-
+    "auto-anti-virus": {
+        name: "AntiVirus.bat",
+        description: "Automate running Anti-Virus scans so you can focus on more important things.",
+        cost: 1000,
+        key: "anti-virus",
+        mod: "auto",
+        value: true,
+        purchased: false
+    },
+    "auto-browser-toolbar": {
+        name: "BrowserToolbar.bat",
+        description: "Automate installing browser toolbars so you can focus on more important things.",
+        cost: 15000,
+        key: "browser-toolbar",
+        mod: "auto",
+        value: true,
+        purchased: false
+    },
+    "auto-crypto-miner": {
+        name: "CryptoMiner.bat",
+        description: "Automate running cryptominers so you can focus on more important things.",
+        cost: 500000,
+        key: "crypto-miner",
+        mod: "auto",
+        value: true,
+        purchased: false
+    },
+    "auto-defrag": {
+        name: "Defrag.bat",
+        description: "Automate running defrags so you can focus on more important things.",
+        cost: 1200000,
+        key: "defrag",
+        mod: "auto",
+        value: true,
+        purchased: false
+    },
+    "auto-render-animation": {
+        name: "RenderAnimation.bat",
+        description: "Automate rendering animations so you can focus on more important things.",
+        cost: 10000000,
+        key: "render-animation",
+        mod: "auto",
+        value: true,
+        purchased: false
+    }
 };
 
 $(function () {
@@ -51,24 +100,47 @@ $(function () {
     $('[data-ram-usage]').text(ram.toFixed(2));
     $('[data-money]').text(money);
 
-    let sections = ``;
+    let sectionsHtml = ``;
     for (let key in items) {
         // load quantity from local storage
         items[key].quantity = parseInt(localStorage.getItem(key));
         if (isNaN(items[key].quantity)) items[key].quantity = (key === "anti-virus" ? 1 : 0);
         items[key].cost = calculateCost(key, items[key].quantity);
-        sections += renderSection(key);
+        sectionsHtml += renderSection(key);
     }
+    $('sections').replaceWith(sectionsHtml);
 
-    $('sections').replaceWith(sections);
+    let upgradesHtml = ``;
+    for (let key in upgrades) {
+        if (localStorage.getItem(key)) {
+            upgrades[key].purchased = true;
+            applyUpdate(key);
+        }
+        upgradesHtml += renderUpgrade(key);
+    }
+    $('upgrades').replaceWith(upgradesHtml);
 
-    $('[data-item]').on('click', '[data-run]:not([disabled])', (elem) => {
+    //todo start running any with auto enabled
+
+    $('[data-open-upgrades]').on('click', () => {
+        $('#upgrades').toggleClass('hidden');
+    });
+
+    $('[data-open-help]').on('click', () => {
+        $('#help').toggleClass('hidden');
+    });
+
+    $('.window').on('click', '[aria-label="Close"]', (elem) => {
+        $(elem.target).parents('.window').toggleClass('hidden');
+    });
+
+    $('section[data-item]').on('click', '[data-run]:not([disabled])', (elem) => {
         let item = $(elem.target).parents('[data-item]');
         item.find('progress').attr('data-enabled', true)[0].value = 0;
         $(item).find('[data-run]').attr('disabled', true);
     });
 
-    $('[data-item]').on('click', '[data-upgrade]:not([disabled])', (elem) => {
+    $('section[data-item]').on('click', '[data-upgrade]:not([disabled])', (elem) => {
 
         let item = $(elem.target).parents('[data-item]');
         let key = item.attr("data-item");
@@ -84,7 +156,7 @@ $(function () {
 
         if (money < cost) {
             // oops can't afford it
-            $(item).find('[data-upgrade]').removeAttr('disabled');
+            $(item).find('[data-upgrade]').attr('disabled', true);
             return;
         }
 
@@ -108,31 +180,74 @@ $(function () {
 
     });
 
+
+    $('section[data-upgrade]').on('click', '[data-purchase]:not([disabled])', (elem) => {
+
+        let item = $(elem.target).parents('[data-upgrade]');
+        let key = item.attr("data-upgrade");
+
+        $(item).find('[data-purchase]').attr('disabled', true);
+
+        let cost = upgrades[key].cost;
+
+        if (money < cost) {
+            // oops can't afford it, the button is already disabled though
+            return;
+        }
+
+        applyUpdate(key);
+
+        localStorage.setItem(key, true);
+        upgrades[key].purchased = true;
+
+        money -= cost;
+        $('[data-money]').text(money);
+        localStorage.setItem("money", money);
+
+    });
+
+
     function step() {
 
-        $("[data-item] progress[data-enabled]").each((_, elem) => {
+        $("section[data-item] progress[data-enabled]").each((_, elem) => {
             if (++$(elem)[0].value >= $(elem).attr("max")) {
-                //todo update time remaining
-                $(elem).removeAttr('data-enabled');
+
                 let item = $(elem).parents('[data-item]');
                 let key = item.attr("data-item");
-                item.find('[data-run]').removeAttr('disabled');
+
+                if (items[key].auto) {
+                    $(elem)[0].value = 0;
+                } else {
+                    $(elem).removeAttr('data-enabled');
+                    item.find('[data-run]').removeAttr('disabled');
+                }
 
                 // increase our earnings
                 money += Math.ceil(items[key].profit * items[key].quantity);
                 $('[data-money]').text(money);
                 localStorage.setItem("money", money);
 
+                //todo update time remaining
+
             }
         });
 
         // update 'upgrade' buttons to see if they're able to afford it
-        $("[data-item]").each((_, elem) => {
+        $("section[data-item]").each((_, elem) => {
             let key = $(elem).attr("data-item");
             if (money >= calculateCost(key, items[key].quantity)) {
                 $(elem).find('[data-upgrade]').removeAttr('disabled');
             } else {
                 $(elem).find('[data-upgrade]').attr('disabled', true);
+            }
+        });
+
+        $("section[data-upgrade]").each((_, elem) => {
+            let key = $(elem).attr("data-upgrade");
+            if (money >= upgrades[key].cost && !upgrades[key].purchased) {
+                $(elem).find('[data-purchase]').removeAttr('disabled');
+            } else {
+                $(elem).find('[data-purchase]').attr('disabled', true);
             }
         });
 
@@ -142,6 +257,16 @@ $(function () {
     window.requestAnimationFrame(step);
 
 });
+
+function applyUpdate(key) {
+    let upgrade = upgrades[key];
+    items[upgrade.key][upgrade.mod] = upgrade.value;
+    if (upgrade.mod == "auto") {
+        let item = $(`section[data-item="${upgrade.key}"] `);
+        item.find('progress').attr('data-enabled', true)[0].value = 0;
+        $(item).find('[data-run]').attr('disabled', true);
+    }
+}
 
 function calculateProfit(key, quantity) {
     let item = items[key];
@@ -170,6 +295,16 @@ function renderSection(key) {
                         </td>
                     </tr>
                 </table>
+            <br/><hr/>
+            </section>`;
+}
+
+function renderUpgrade(key) {
+    let upgrade = upgrades[key];
+    return `<section data-upgrade="${key}">
+                <p>${upgrade.name} ${upgrade.purchased ? "- Purchased" : ""}</p>
+                <p>${upgrade.description}</p>
+                <button ${upgrade.purchased ? "disabled" : ""} data-purchase><span ${upgrade.purchased ? "class='strikethrough'" : ""}>Upgrade (<span data-cost>${upgrade.cost}</span>&micro;&#8383;)</span></button>
             <br/><hr/>
             </section>`;
 }
