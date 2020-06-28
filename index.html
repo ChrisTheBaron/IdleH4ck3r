@@ -16,7 +16,7 @@
 </head>
 <body>
 
-    <div class="window">
+    <div class="window" id="main">
         <div class="title-bar">
 
             <div class="title-bar-text">
@@ -31,16 +31,20 @@
         <div class="window-body">
 
             <section>
-                <p>
-                    Total Ram Usage: <span data-ram-usage>2</span>MB
-                </p>
-                <p>
-                    Wallet: <span data-money>0</span>&micro;&#8383;
-                </p>
-                <button data-open-upgrades>Purchase Upgrades</button>
+                <table width="100%">
+                    <tr>
+                        <td width="50%">
+                            Total Ram Usage: <span data-ram-usage>2</span>MB
+                            <br />
+                            <br />
+                            Wallet: <span data-money>0</span>&micro;&#8383;
+                        </td>
+                        <td width="50%" align="right" valign="top">
+                            <button data-open-upgrades>Purchase Upgrades</button>
+                        </td>
+                    </tr>
+                </table>
             </section>
-
-            <hr />
 
             <sections />
 

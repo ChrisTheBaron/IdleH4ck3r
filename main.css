@@ -59,6 +59,12 @@ progress {
     }
 }
 
+@media only screen and (max-width: 499px) {
+    #main {
+        min-height: calc(100vh - 6px);
+    }
+}
+
 .hidden {
     display: none;
 }

@@ -345,6 +345,7 @@ function calculateCost(key, quantity) {
 function renderSection(key) {
     let section = items[key];
     return `<section data-item="${key}">
+                <hr/>
                 <p><u>${section.name}</u></p>
                 <progress value="0" max="${section.length}"></progress>
                 <table width="100%">
@@ -359,7 +360,7 @@ function renderSection(key) {
                         </td>
                     </tr>
                 </table>
-            <br/><hr/>
+            
             </section>`;
 }
 
