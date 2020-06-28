@@ -126,6 +126,13 @@ $(function () {
 
     sfxback.mute(!playMusic);
 
+    window.onfocus = function () {
+        sfxback.mute(!playMusic);
+    };
+    window.onblur = function () {
+        sfxback.mute(true);
+    };
+
     let money = parseInt(localStorage.getItem("money"));
     let ram = parseFloat(localStorage.getItem("ram"));
 
