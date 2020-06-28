@@ -91,6 +91,10 @@ let upgrades = {
 
 $(function () {
 
+    if (localStorage.getItem("timestamp") == null) {
+        $('#help').toggleClass('hidden');
+    }
+
     let sfx1 = new Howl({
         src: ['./sfx001.mp3']
     });
@@ -102,6 +106,25 @@ $(function () {
     let sfx3 = new Howl({
         src: ['./sfx003.mp3']
     });
+
+    let sfxback = new Howl({
+        src: ['./POL-pocket-garden-short.mp3'],
+        loop: true,
+        autoplay: true,
+        volume: 0.2
+    });
+
+    let playMusic = localStorage.getItem("music");
+    let playSounds = localStorage.getItem("sounds");
+
+    // parse as bool, default to true
+    playMusic = playMusic != "false";
+    playSounds = playSounds != "false";
+
+    $('#music').prop('checked', playMusic);
+    $('#sounds').prop('checked', playSounds);
+
+    sfxback.mute(!playMusic);
 
     let money = parseInt(localStorage.getItem("money"));
     let ram = parseFloat(localStorage.getItem("ram"));
@@ -132,7 +155,16 @@ $(function () {
     }
     $('upgrades').replaceWith(upgradesHtml);
 
-    //todo start running any with auto enabled
+    $('#music').on('change', () => {
+        playMusic = $('#music').prop('checked');
+        localStorage.setItem("music", playMusic);
+        sfxback.mute(!playMusic);
+    });
+
+    $('#sounds').on('change', () => {
+        playSounds = $('#sounds').prop('checked')
+        localStorage.setItem("sounds", playSounds);
+    });
 
     $('[data-open-upgrades]').on('click', () => {
         $('#upgrades').toggleClass('hidden');
@@ -190,7 +222,7 @@ $(function () {
 
         localStorage.setItem(key, items[key].quantity);
 
-        sfx1.play();
+        if (playSounds) sfx1.play();
 
     });
 
@@ -218,13 +250,11 @@ $(function () {
         $('[data-money]').text(money);
         localStorage.setItem("money", money);
 
-        sfx2.play();
+        if (playSounds) sfx2.play();
 
     });
 
-
-    function step() {
-
+    function progress() {
         $("section[data-item] progress[data-enabled]").each((_, elem) => {
             if (++$(elem)[0].value >= $(elem).attr("max")) {
 
@@ -236,7 +266,7 @@ $(function () {
                 } else {
                     $(elem).removeAttr('data-enabled');
                     item.find('[data-run]').removeAttr('disabled');
-                    sfx3.play();
+                    if (playSounds) sfx3.play();
                 }
 
                 // increase our earnings
@@ -246,8 +276,18 @@ $(function () {
 
                 //todo update time remaining
 
+            } else {
+                let remaining = $(elem).attr("max") - $(elem)[0].value;
+                remaining = Math.ceil(remaining / (1000 / 60));
+                $(elem).parents('section[data-item]').find('[data-time-remaining]').text(remaining);
             }
         });
+        localStorage.setItem("timestamp", new Date().getTime());
+    }
+
+    setInterval(progress, 1000 / 60); // 60 fps
+
+    function step() {
 
         // update 'upgrade' buttons to see if they're able to afford it
         $("section[data-item]").each((_, elem) => {
@@ -298,12 +338,12 @@ function calculateCost(key, quantity) {
 function renderSection(key) {
     let section = items[key];
     return `<section data-item="${key}">
-                <p>${section.name}</p>
+                <p><u>${section.name}</u></p>
                 <progress value="0" max="${section.length}"></progress>
                 <table width="100%">
                     <tr>
                         <td width="30%">
-                            <p>5 seconds remaining</p>
+                            <p><span data-time-remaining>0</span>&nbsp;seconds remaining</p>
                         </td>
                         <td width="60%" align="right">
                             <button ${section.quantity >= 1 ? "" : "disabled"} data-run>Run x<span data-quantity>${section.quantity}</span></button>
@@ -319,7 +359,7 @@ function renderSection(key) {
 function renderUpgrade(key) {
     let upgrade = upgrades[key];
     return `<section data-upgrade="${key}">
-                <p>${upgrade.name} ${upgrade.purchased ? "- Purchased" : ""}</p>
+                <p><u>${upgrade.name} ${upgrade.purchased ? "- Purchased" : ""}</u></p>
                 <p>${upgrade.description}</p>
                 <button ${upgrade.purchased ? "disabled" : ""} data-purchase><span ${upgrade.purchased ? "class='strikethrough'" : ""}>Upgrade (<span data-cost>${upgrade.cost}</span>&micro;&#8383;)</span></button>
             <br/><hr/>
